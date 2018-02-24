@@ -32,4 +32,4 @@ def caesar_cypher(string, shift)
 	puts string
 end
 
-caesar_cypher('Hello, World!', 5)
+caesar_cypher("What a string!", 5)
