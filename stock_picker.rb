@@ -44,8 +44,8 @@ def stock_picker(array)
     highest_prices_pair = highest_prices[lowest_prices.index(low)]
     if highest_prices_pair != nil && highest_prices_pair > low
       result_message = "The best day to buy is #{array.index(low)} and the best day to sell is #{array.index(highest_prices_pair)}" if highest_prices_pair - low > biggest_diff
-  	  biggest_diff = highest_prices_pair - low if highest_prices_pair - low > biggest_diff	  
-  	end
+  	  biggest_diff = highest_prices_pair - low if highest_prices_pair - low > biggest_diff
+    end
   end
   puts result_message
 end
