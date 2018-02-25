@@ -1,1 +1,2 @@
-A little shift cipher made in Ruby
+A few Ruby problems
+$ruby exercisename.rb for testing
