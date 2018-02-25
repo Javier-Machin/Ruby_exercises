@@ -19,7 +19,6 @@ def stock_picker(array)
 
   highest_prices << highest_price
   highest_price = 0
-
   #Keeps adding stock values to both arrays where the highest_prices index in the stocks array is higher than the lowest_prices counterpart
   #Stops when there is no more possible selling or buying days
   until lowest_prices.include?(999)
@@ -43,13 +42,11 @@ def stock_picker(array)
 
   lowest_prices.each do |low|
     highest_prices_pair = highest_prices[lowest_prices.index(low)]
-
-  	if highest_prices_pair != nil && highest_prices_pair > low
-  	  result_message = "The best day to buy is #{array.index(low)} and the best day to sell is #{array.index(highest_prices_pair)}" if highest_prices_pair - low > biggest_diff
+    if highest_prices_pair != nil && highest_prices_pair > low
+      result_message = "The best day to buy is #{array.index(low)} and the best day to sell is #{array.index(highest_prices_pair)}" if highest_prices_pair - low > biggest_diff
   	  biggest_diff = highest_prices_pair - low if highest_prices_pair - low > biggest_diff	  
   	end
   end
-
   puts result_message
 end
 
