@@ -9,44 +9,38 @@ module Enumerable
   end
 
   def my_select
+    return self.to_enum if !(block_given?)
   	my_selection = []
-  	(self.length).times { |index| my_selection << self[index] if (yield(self[index])) }
+  	self.my_each { |item| my_selection << item if yield(item) }
   	my_selection
   end
 
-  def my_all?
-  	if !(block_given?)
-  	  self.length.times { |index| return false if self[index] == false || self[index] == nil }
-  	  return true
-  	end
-    my_selection = []
-  	(self.length).times { |index| my_selection << self[index] if (yield(self[index])) }
-  	return true if self == my_selection  
-  	return false
+  def my_all?(&block)
+    if !(block_given?)
+      self.my_each { |item| return false if item == false || item == nil }
+      return true
+    end
+    my_selection = self.my_select &block
+    return true if self == my_selection  
+    false
   end
 
-  def my_any?
-  	if !(block_given?)
-  	  self.length.times { |index| return true if (self[index]) }
-  	  return false
-  	end
-  	self.length.times { |index| return true if (yield(self[index])) }
-  	return false
-  end	
- 
   def my_none?
-  	if !(block_given?)
-  	  self.length.times { |index| return false if (self[index]) }
-  	  return true
-  	end
-  	self.length.times { |index| return false if (yield(self[index])) }
-  	return true
+    if !(block_given?)
+    self.my_each { |item| return false if item}
+    return true
+  end
+    self.my_each { |item| return false if (yield(item)) }
+    true
   end
 
-  #def my_count	
+  def my_any?(&block) 
+    !(self.my_none? &block)
+  end
+
 end 
 
-array1 = ["hi", 43, "potatoes", "poopy", 33]
+array1 = ["hi", 43, "potatoes", "horses", 33]
 
 puts "my_each output\:";puts ""
 array1.my_each { |item| puts item }
@@ -68,19 +62,18 @@ puts array1.select { |item| item.to_s.length > 2 }
 
 puts "";puts "my_all? output\:";puts ""
 puts ["lul","what","potatoes", "uhh"].my_all? {|word| word.length >= 3}
+puts ["lul","what","potatoes", "uhh", nil].my_all?
 
 puts "";puts "all? output\:";puts ""
 puts ["lul","what","potatoes", "uhh"].all? {|word| word.length >= 3}
+puts ["lul","what","potatoes", "uhh", nil].all?
 
-puts "";puts "my_any? output\:";puts ""
-puts ["ant", "bear", "cat"].my_any? {|word| word.length >= 3}   
-puts ["ant", "bear", "cat"].my_any? {|word| word.length >= 4}   
-puts [ nil, true, 99 ].my_any?
-
-puts "";puts "any? output\:";puts ""
-puts ["ant", "bear", "cat"].any? {|word| word.length >= 3}   
-puts ["ant", "bear", "cat"].any? {|word| word.length >= 4}   
-puts [ nil, true, 99 ].my_any?
+puts "";puts "none? output\:";puts ""
+puts %w{ant bear cat}.none? {|word| word.length == 5}  
+puts %w{ant bear cat}.none? {|word| word.length >= 4}
+puts [].none?                                          
+puts [nil].none?                                       
+puts [nil,false].none?
 
 puts "";puts "my_none? output\:";puts ""
 puts %w{ant bear cat}.my_none? {|word| word.length == 5}  
@@ -89,9 +82,13 @@ puts [].my_none?
 puts [nil].my_none?                                       
 puts [nil,false].my_none?
 
-puts "";puts "none? output\:";puts ""
-puts %w{ant bear cat}.none? {|word| word.length == 5}  
-puts %w{ant bear cat}.none? {|word| word.length >= 4}
-puts [].none?                                          
-puts [nil].none?                                       
-puts [nil,false].none?
+puts "";puts "any? output\:";puts ""
+puts ["ant", "bear", "cat"].any? {|word| word.length >= 3}   
+puts ["ant", "bear", "cat"].any? {|word| word.length >= 4}   
+puts [ nil, true, 99 ].any?
+                                       
+puts "";puts "my_any? output\:";puts ""
+puts ["ant", "bear", "cat"].my_any? {|word| word.length >= 3}   
+puts ["ant", "bear", "cat"].my_any? {|word| word.length >= 4}   
+puts [ nil, true, 99 ].my_any?
+
