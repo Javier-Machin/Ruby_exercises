@@ -38,7 +38,50 @@ module Enumerable
     !(self.my_none? &block)
   end
 
+  def my_count(&block)
+    count = 0
+    if !(block_given?)
+      count = self.length
+      return count
+    end
+    count = self.my_select(&block).length
+  end
+
+  def my_map(&proc)
+    array = self.to_a
+    mapped_array = []
+    if !(block_given?)
+      mapped_array = array.to_enum
+      return mapped_array
+    end
+    array.my_each { |item| mapped_array << yield(item) }
+    mapped_array
+  end
+
+  def my_inject(*arguments)
+    array = self.to_a
+    if arguments.length > 0 && arguments[0].class != Symbol
+      accumulator = arguments[0]
+      array.my_each { |item| accumulator = yield(accumulator, item) }
+    elsif arguments.length == 0
+      accumulator = self.to_a[0]
+      array[1..-1].my_each { |item| accumulator = yield(accumulator, item) }
+    elsif arguments[0].class == Symbol
+      accumulator = self.to_a[0]
+      operation = arguments[0]
+      array[1..-1].my_each { |item| accumulator = accumulator.send(operation, item) }
+    end
+    accumulator
+  end
+
+  def multiply_els(array)
+    array.my_inject { |product, n| product * n }
+  end
+
 end 
+
+include Enumerable
+
 
 array1 = ["hi", 43, "potatoes", "horses", 33]
 
@@ -92,3 +135,48 @@ puts ["ant", "bear", "cat"].my_any? {|word| word.length >= 3}
 puts ["ant", "bear", "cat"].my_any? {|word| word.length >= 4}   
 puts [ nil, true, 99 ].my_any?
 
+puts "";puts "count output\:";puts ""
+puts ["ant", "bear", "cat"].count   
+puts ["ant", "bear", "cat"].count {|word| word.length >= 4}   
+puts [1, 2, 4, 2].count { |x| x % 2 == 0 } 
+
+
+puts "";puts "my_count output\:";puts ""
+puts ["ant", "bear", "cat"].my_count   
+puts ["ant", "bear", "cat"].my_count {|word| word.length >= 4}   
+puts [1, 2, 4, 2].my_count { |x| x % 2 == 0 }
+
+testyproc = Proc.new { |i| i * i } 
+
+puts "";puts "my_map output\:";puts ""
+puts (1..4).my_map { |i| i * i }     
+puts (1..4).my_map { "cat" }
+puts (1..4).my_map(&testyproc)
+
+puts "";puts "map output\:";puts ""
+puts (1..4).map { |i| i * i }      
+puts (1..4).map { "cat" } 
+puts (1..4).map(&testyproc) 
+
+longest = %w{ cat sheep bear }.inject do |memo, word|
+   memo.length > word.length ? memo : word
+end
+
+puts "";puts "inject output\:";puts ""
+puts (5..10).inject { |sum, n| sum + n }
+puts (5..10).inject(:+)
+puts (5..10).inject { |product, n| product * n }
+puts longest
+
+longest = %w{ cat sheep bear }.my_inject do |memo, word|
+   memo.length > word.length ? memo : word
+end
+
+puts "";puts "my_inject output\:";puts ""
+puts (5..10).my_inject { |sum, n| sum + n }
+puts (5..10).my_inject(:+)
+puts (5..10).my_inject { |product, n| product * n }
+puts longest
+
+puts "";puts "multiply_els output\:";puts ""
+puts multiply_els([2,4,5])
